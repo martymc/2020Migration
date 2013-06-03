@@ -48,9 +48,9 @@ public class Main {
 
             FileOutputStream fosData = new FileOutputStream("InsertData.sql");
             OutputStreamWriter outData = new OutputStreamWriter(fosData, "UTF-8");
-            out.write(insertData.toString());
-            out.flush();
-            fos.flush();
+            outData.write(insertData.toString());
+            outData.flush();
+            fosData.flush();
 
 
         } catch (IOException ex)
