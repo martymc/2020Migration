@@ -8,52 +8,56 @@ public class Main {
 
     public static void main(String [] args)
     {
-        System.out.print("Begin...");
+        System.out.print("Iterating over directory " + args[0]);
 
         try {
 
-            int firstRow = 0;
+            File dir = new File(args[0]);
+            for (File child : dir.listFiles())
+            {
+                String tableName = child.getName().replace(".csv", "");
+                int firstRow = 0;
 
-            CSVReader reader = new CSVReader(new FileReader("/Users/mmcallis/IdeaProjects/2020Migration/inputs/OracleTable.csv"));
+                CSVReader reader = new CSVReader(new FileReader(child));
 
-            StringBuilder createTable = new StringBuilder();
-            StringBuilder insertData = new StringBuilder();
+                StringBuilder createTable = new StringBuilder();
+                StringBuilder insertData = new StringBuilder();
 
-            String [] nextLine;
-            while ((nextLine = reader.readNext()) != null) {
+                String [] nextLine;
+                while ((nextLine = reader.readNext()) != null) {
 
 
-                if (firstRow == 0)
-                {
-                    //make a table script...
-                    MakeTable(createTable, nextLine);
-                    firstRow++;
+                    if (firstRow == 0)
+                    {
+                        //make a table script...
+                        MakeTable(createTable, nextLine, tableName);
+                        firstRow++;
 
+                    }
+                    else
+                    {
+                        InsertData(insertData, nextLine, tableName);
+                    }
+
+                    // nextLine[] is an array of values from the line
+                    //System.out.println(nextLine[0] + nextLine[1] + "etc...");
                 }
-                else
-                {
-                    InsertData(insertData, nextLine);
-                }
 
-                // nextLine[] is an array of values from the line
-                //System.out.println(nextLine[0] + nextLine[1] + "etc...");
+                //write out the stuff.
+                FileOutputStream fos = new FileOutputStream(tableName + "CreateTable.sql");
+                OutputStreamWriter out = new OutputStreamWriter(fos, "UTF-8");
+                out.write(createTable.toString());
+                out.flush();
+                fos.flush();
+
+                FileOutputStream fosData = new FileOutputStream(tableName + "InsertData.sql");
+                OutputStreamWriter outData = new OutputStreamWriter(fosData, "UTF-8");
+                outData.write(insertData.toString());
+                outData.flush();
+                fosData.flush();
             }
-
-            //write out the stuff.
-            FileOutputStream fos = new FileOutputStream("CreateTable.sql");
-            OutputStreamWriter out = new OutputStreamWriter(fos, "UTF-8");
-            out.write(createTable.toString());
-            out.flush();
-            fos.flush();
-
-            FileOutputStream fosData = new FileOutputStream("InsertData.sql");
-            OutputStreamWriter outData = new OutputStreamWriter(fosData, "UTF-8");
-            outData.write(insertData.toString());
-            outData.flush();
-            fosData.flush();
-
-
-        } catch (IOException ex)
+        }
+        catch (IOException ex)
         {
               ex.printStackTrace();
         }
@@ -65,13 +69,13 @@ public class Main {
 
     }
 
-    private static void InsertData(StringBuilder sqlString, String[] nextLine)
+    private static void InsertData(StringBuilder sqlString, String[] nextLine, String tableName)
     {
         for (int i=0; i<nextLine.length; i++ )
         {
             if (i==0)
             {
-                sqlString.append("insert into oracle values( '" + nextLine[i].toString().replace("'", "''") + "'\n");
+                sqlString.append("insert into " + tableName + " values( '" + nextLine[i].toString().replace("'", "''") + "'\n");
                 //sqlString.append("`" + nextLine[i] + "` varchar(250)\n");
             }
             else
@@ -83,9 +87,9 @@ public class Main {
         sqlString.append(");\n");
     }
 
-    private static void MakeTable(StringBuilder sqlString, String[] nextLine)
+    private static void MakeTable(StringBuilder sqlString, String[] nextLine, String tableName)
     {
-        sqlString.append("create table oracle (");
+        sqlString.append("create table " + tableName + " (");
         for (int i=0; i<nextLine.length; i++ )
         {
             if (i==0)
