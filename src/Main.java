@@ -17,7 +17,7 @@ public class Main {
             for (File child : dir.listFiles(getCSVFilter()))
             {
                 String tableName = child.getName().replace(".csv", "");
-                int firstRow = 0;
+                int count = 0;
 
                 CSVReader reader = new CSVReader(new FileReader(child));
 
@@ -28,20 +28,16 @@ public class Main {
                 while ((nextLine = reader.readNext()) != null) {
 
 
-                    if (firstRow == 0)
+                    if (count == 0)
                     {
                         //make a table script...
                         MakeTable(createTable, nextLine, tableName);
-                        firstRow++;
-
+                        count++;
                     }
                     else
                     {
                         InsertData(insertData, nextLine, tableName);
                     }
-
-                    // nextLine[] is an array of values from the line
-                    //System.out.println(nextLine[0] + nextLine[1] + "etc...");
                 }
 
                 //write out the stuff.
@@ -53,12 +49,6 @@ public class Main {
         {
               ex.printStackTrace();
         }
-        /*catch (FileNotFoundException e) {
-
-            System.out.print("Couldn't find a CSV file to parse.");
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-        }*/
-
     }
 
     private static void writeFile(String tableName, StringBuilder fileContents, String fileName) throws IOException
