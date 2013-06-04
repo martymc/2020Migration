@@ -13,7 +13,8 @@ public class Main {
         try {
 
             File dir = new File(args[0]);
-            for (File child : dir.listFiles())
+
+            for (File child : dir.listFiles(getCSVFilter()))
             {
                 String tableName = child.getName().replace(".csv", "");
                 int firstRow = 0;
@@ -44,17 +45,8 @@ public class Main {
                 }
 
                 //write out the stuff.
-                FileOutputStream fos = new FileOutputStream(tableName + "CreateTable.sql");
-                OutputStreamWriter out = new OutputStreamWriter(fos, "UTF-8");
-                out.write(createTable.toString());
-                out.flush();
-                fos.flush();
-
-                FileOutputStream fosData = new FileOutputStream(tableName + "InsertData.sql");
-                OutputStreamWriter outData = new OutputStreamWriter(fosData, "UTF-8");
-                outData.write(insertData.toString());
-                outData.flush();
-                fosData.flush();
+                writeFile(tableName, createTable, "CreateTable.sql");
+                writeFile(tableName, insertData, "InsertData.sql");
             }
         }
         catch (IOException ex)
@@ -67,6 +59,35 @@ public class Main {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }*/
 
+    }
+
+    private static void writeFile(String tableName, StringBuilder fileContents, String fileName) throws IOException
+    {
+        FileOutputStream fos = new FileOutputStream(tableName + fileName);
+        OutputStreamWriter out = new OutputStreamWriter(fos, "UTF-8");
+        out.write(fileContents.toString());
+        out.flush();
+        fos.flush();
+    }
+
+    private static FilenameFilter getCSVFilter()
+    {
+        FilenameFilter CSVFilter = new FilenameFilter() {
+            @Override
+            public boolean accept(File file, String name) {
+                String lowercasename = name.toLowerCase();
+                if (lowercasename.endsWith(".csv"))
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+        };
+
+        return CSVFilter;
     }
 
     private static void InsertData(StringBuilder sqlString, String[] nextLine, String tableName)
