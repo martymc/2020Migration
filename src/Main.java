@@ -2,7 +2,6 @@ import au.com.bytecode.opencsv.*;
 
 import java.io.*;
 import java.util.ArrayList;
-import java.util.HashMap;
 
 
 public class Main {
@@ -102,13 +101,13 @@ public class Main {
             if (count == 0)
             {
                 //populate hashmap keys
-                PopulateHashMapKeys(fieldsAndLength, nextLine);
+                PopulateFieldNames(fieldsAndLength, nextLine);
 
             }
             else
             {
                 //populate hahmap values
-                PopulateHashMapLengths(fieldsAndLength, nextLine);
+                PopulateFieldLengths(fieldsAndLength, nextLine);
             }
             count++;
 
@@ -118,7 +117,7 @@ public class Main {
         return fieldsAndLength;
     }
 
-    private static void PopulateHashMapKeys(ArrayList<Integer> fieldsAndLength, String[] nextLine)
+    private static void PopulateFieldNames(ArrayList<Integer> fieldsAndLength, String[] nextLine)
     {
         for (int i=0; i<nextLine.length; i++ )
         {
@@ -127,7 +126,7 @@ public class Main {
         }
     }
 
-    private static void PopulateHashMapLengths(ArrayList<Integer> fieldsAndLength, String[] nextLine)
+    private static void PopulateFieldLengths(ArrayList<Integer> fieldsAndLength, String[] nextLine)
     {
         for (int i=0; i<nextLine.length; i++ )
         {
